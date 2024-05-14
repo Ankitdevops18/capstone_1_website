@@ -24,7 +24,7 @@
                    // Run tests on Docker image
                    sh '''
                    scp *.yaml ubuntu@100.26.214.200:/tmp/
-                   ssh ubuntu@100.26.214.200 'cd /tmp && kubectl apply -f deployment.yaml && kubectl apply -f service.yaml'
+                   ssh ubuntu@100.26.214.200 'cd /tmp && sudo kubectl apply -f deployment.yaml && sudo kubectl apply -f service.yaml'
 
                    '''
                }

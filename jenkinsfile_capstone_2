@@ -1,5 +1,3 @@
-
-
    pipeline {
        agent any
     triggers {
@@ -21,7 +19,7 @@
            }
            stage('Deploy') {
                steps {
-                   // Run tests on Docker image
+                // pull K8s manifest files with the updated image & deploy the cluster
                    sh '''
                    scp *.yaml ubuntu@100.26.214.200:/tmp/
                    ssh ubuntu@100.26.214.200 'cd /tmp && sudo kubectl apply -f deployment.yaml && sudo kubectl apply -f service.yaml'

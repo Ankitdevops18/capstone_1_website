@@ -1,0 +1,44 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE = 'build-environment:latest'
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                script {
+                    // Pull the code from GitHub
+                    checkout scm
+
+                    // Build the Docker image
+                    sh 'docker build -t ${DOCKER_IMAGE} .'
+
+                    // Run the Docker container and build the project inside it
+                    sh 'docker run --rm -v $(pwd):/var/www/html ${DOCKER_IMAGE} /bin/bash -c "cp -r /var/www/html/* /var/www/html"'
+                }
+            }
+        }
+        stage('Deploy') {
+            when {
+                branch 'master'
+            }
+            steps {
+                script {
+                    // Remove any existing container running on port 82
+                    sh 'docker rm -f web || true'
+
+                    // Run the new container
+                    sh 'docker run -d -p 82:80 --name web -v $(pwd)/website:/var/www/html ${DOCKER_IMAGE}'
+                }
+            }
+        }
+    }
+    post {
+        always {
+            // Clean up Docker resources
+            sh 'docker rmi ${DOCKER_IMAGE}'
+        }
+    }
+}

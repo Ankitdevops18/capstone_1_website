@@ -6,7 +6,7 @@ pipeline {
             steps {
                 script {
                     // Pull the code from GitHub
-                    git 'https://github.com/Ankitdevops18/capstone_1_website.git'
+                    git branch: 'develop', url: 'https://github.com/Ankitdevops18/capstone_1_website.git'
                     // Build Docker image
                     sh 'docker build -t my_webapp .'
 

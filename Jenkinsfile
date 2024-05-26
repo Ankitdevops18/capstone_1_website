@@ -1,37 +1,37 @@
 pipeline {
     agent any
 
-    environment {
-        GIT_REPO_URL = 'https://github.com/Ankitdevops18/capstone_1_website.git'
-        TARGET_DIR = '/assignment1'  // Change this to your desired folder
-    }
-
-    triggers {
-        githubPush()
-    }
-
     stages {
-        stage('Clone Repository') {
+        stage('Build') {
             steps {
                 script {
-                    // Ensure the target directory exists and is clean
-                    sh "rm -rf ${TARGET_DIR}"
-                    sh "mkdir -p ${TARGET_DIR}"
+                    // Pull the code from GitHub
+                    git 'https://github.com/Ankitdevops18/capstone_1_website.git'
+                    // Build Docker image
+                    sh 'docker build -t my_webapp .'
 
-                    // Clone the repository into the target directory
-                    git branch: 'develop', url: "${GIT_REPO_URL}"
-                    sh "cp -r * ${TARGET_DIR}/"
+                }
+            }
+        }
+        stage('Deploy') {
+            when {
+                branch 'master'
+            }
+            steps {
+                script {
+                    // Remove any existing container running on port 82
+                    sh 'docker rm -f web || true'
+
+                    // Run the new container
+                    sh 'docker run -d -p 82:80 --name web my_webapp'
                 }
             }
         }
     }
-
     post {
         always {
-            script {
-                // Clean up any temporary files if needed
-                sh "rm -rf ${TARGET_DIR}/tmp"
-            }
+            // Clean up Docker resources
+            sh 'docker rmi my_webapp'
         }
     }
 }

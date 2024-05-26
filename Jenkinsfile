@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        GIT_REPO_URL = 'https://github.com/hshar/website.git'
+        GIT_REPO_URL = 'https://github.com/Ankitdevops18/capstone_1_website.git'
         TARGET_DIR = '/assignment1'  // Change this to your desired folder
     }
 

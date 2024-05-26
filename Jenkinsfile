@@ -14,9 +14,6 @@ pipeline {
             }
         }
         stage('Deploy') {
-            when {
-                branch 'origin/master'
-            }
             steps {
                 script {
                     // Remove any existing container running on port 82

@@ -1,15 +1,22 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKER_IMAGE = 'build-environment:latest'
+    }
+
     stages {
         stage('Build') {
             steps {
                 script {
                     // Pull the code from GitHub
-                    git branch: 'develop', url: 'https://github.com/Ankitdevops18/capstone_1_website.git'
-                    // Build Docker image
-                    sh 'docker build -t my_webapp .'
+                    checkout scm
 
+                    // Build the Docker image
+                    sh 'docker build -t ${DOCKER_IMAGE} .'
+
+                    // Run the Docker container and build the project inside it
+                    sh 'docker run --rm -v $(pwd):/var/www/html ${DOCKER_IMAGE} /bin/bash -c "cp -r /var/www/html/* /var/www/html"'
                 }
             }
         }
@@ -23,7 +30,7 @@ pipeline {
                     sh 'docker rm -f web || true'
 
                     // Run the new container
-                    sh 'docker run -d -p 82:80 --name web my_webapp'
+                    sh 'docker run -d -p 82:80 --name web -v $(pwd)/website:/var/www/html ${DOCKER_IMAGE}'
                 }
             }
         }
@@ -31,7 +38,7 @@ pipeline {
     post {
         always {
             // Clean up Docker resources
-            sh 'docker rmi my_webapp'
+            sh 'docker rmi ${DOCKER_IMAGE}'
         }
     }
 }
